@@ -10,16 +10,23 @@
 #include "ui-atom.h"
 #include "html.h"
 #include "ui-shared.h"
+#include "ui-diff.h"
 
-static void add_entry(struct commit *commit, const char *host)
+static void add_entry(struct commit *commit, const char *host, int enable_atom_diff)
 {
 	char delim = '&';
 	char *hex;
+	char *hex_parent;
 	char *mail, *t, *t2;
 	struct commitinfo *info;
 
 	info = cgit_parse_commit(commit);
 	hex = sha1_to_hex(commit->object.sha1);
+	if (commit->parents) {
+		hex_parent = sha1_to_hex(commit->parents->item->object.sha1);
+	} else {
+		hex_parent = NULL; /* means before initial commit */
+	}
 	html("<entry>\n");
 	html("<title>");
 	html_txt(info->subject);
@@ -71,6 +78,15 @@ static void add_entry(struct commit *commit, const char *host)
 	html("<pre>\n");
 	html_txt(info->msg);
 	html("</pre>\n");
+	if (enable_atom_diff) {
+		html("<pre class='diff'>\n");
+		html("<style scoped=\"scoped\">\n"); /* HTML5 with graceful degradation */
+		html("table.diff .add, span.add { background-color: #afa; }");
+		html("table.diff .del, span.remove { background-color: #faa; }");
+		html("</style>\n");
+		cgit_print_diff(hex, hex_parent, NULL, 0, 0);
+		html("</pre>");
+	}
 	html("</div>\n");
 	html("</content>\n");
 	html("</entry>\n");
@@ -78,7 +94,7 @@ static void add_entry(struct commit *commit, const char *host)
 }
 
 
-void cgit_print_atom(char *tip, char *path, int max_count)
+void cgit_print_atom(char *tip, char *path, int max_count, int enable_atom_diff)
 {
 	const char *host;
 	const char *argv[] = {NULL, tip, NULL, NULL, NULL};
@@ -132,7 +148,7 @@ void cgit_print_atom(char *tip, char *path, int max_count)
 		html("'/>\n");
 	}
 	while ((commit = get_revision(&rev)) != NULL) {
-		add_entry(commit, host);
+		add_entry(commit, host, enable_atom_diff);
 		free(commit->buffer);
 		commit->buffer = NULL;
 		free_commit_list(commit->parents);

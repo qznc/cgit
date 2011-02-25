@@ -33,7 +33,7 @@ static void HEAD_fn(void)
 
 static void atom_fn(void)
 {
-	cgit_print_atom(ctx.qry.head, ctx.qry.path, ctx.cfg.max_atom_items);
+	cgit_print_atom(ctx.qry.head, ctx.qry.path, ctx.cfg.max_atom_items, ctx.repo->enable_atom_diff);
 }
 
 static void about_fn(void)

@@ -57,6 +57,7 @@ struct cgit_repo *cgit_add_repo(const char *url)
 	ret->owner = NULL;
 	ret->section = ctx.cfg.section;
 	ret->snapshots = ctx.cfg.snapshots;
+	ret->enable_atom_diff = ctx.cfg.enable_atom_diff;
 	ret->enable_commit_graph = ctx.cfg.enable_commit_graph;
 	ret->enable_log_filecount = ctx.cfg.enable_log_filecount;
 	ret->enable_log_linecount = ctx.cfg.enable_log_linecount;
