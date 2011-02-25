@@ -472,6 +472,10 @@ void cgit_self_link(char *name, const char *title, const char *class,
 	else if (!strcmp(ctx->qry.page, "stats"))
 		return cgit_stats_link(name, title, class, ctx->qry.head,
 				      ctx->qry.path);
+	else if (!strcmp(ctx->qry.page, "atom"))
+		return cgit_diff_link(name, title, class, ctx->qry.head,
+				      ctx->qry.sha1, ctx->qry.sha2,
+				      ctx->qry.path, 0);
 
 	/* Don't known how to make link for this page */
 	repolink(title, class, ctx->qry.page, ctx->qry.head, ctx->qry.path);

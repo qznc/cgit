@@ -336,6 +336,10 @@ void cgit_print_diff(const char *new_rev, const char *old_rev, const char *prefi
 	unsigned long size;
 	struct commit *commit, *commit2;
 
+	/* reset global data */
+	files = 0;
+	slots = total_adds = total_rems = 0;
+
 	if (!new_rev)
 		new_rev = ctx.qry.head;
 	get_sha1(new_rev, new_rev_sha1);
