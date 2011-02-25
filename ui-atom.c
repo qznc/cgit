@@ -10,16 +10,23 @@
 #include "ui-atom.h"
 #include "html.h"
 #include "ui-shared.h"
+#include "ui-diff.h"
 
 static void add_entry(struct commit *commit, const char *host)
 {
 	char delim = '&';
 	char *hex;
+	char *hex_parent;
 	char *mail, *t, *t2;
 	struct commitinfo *info;
 
 	info = cgit_parse_commit(commit);
 	hex = sha1_to_hex(commit->object.sha1);
+	if (commit->parents) {
+		hex_parent = sha1_to_hex(commit->parents->item->object.sha1);
+	} else {
+		hex_parent = NULL; /* means before initial commit */
+	}
 	html("<entry>\n");
 	html("<title>");
 	html_txt(info->subject);
@@ -71,6 +78,9 @@ static void add_entry(struct commit *commit, const char *host)
 	html("<pre>\n");
 	html_txt(info->msg);
 	html("</pre>\n");
+	html("<div class='diff'>\n");
+	cgit_print_diff(hex, hex_parent, NULL, 0, 0);
+	html("</div>");
 	html("</div>\n");
 	html("</content>\n");
 	html("</entry>\n");
