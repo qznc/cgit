@@ -12,15 +12,13 @@
 #include "ui-shared.h"
 #include "ui-diff.h"
 
-static void add_entry(struct commit *commit, const char *host, int enable_atom_diff)
+static void add_entry(struct commit *commit, struct commitinfo *info, char *host, int enable_atom_diff)
 {
 	char delim = '&';
 	char *hex;
 	char *hex_parent;
 	char *mail, *t, *t2;
-	struct commitinfo *info;
 
-	info = cgit_parse_commit(commit);
 	hex = sha1_to_hex(commit->object.sha1);
 	if (commit->parents) {
 		hex_parent = sha1_to_hex(commit->parents->item->object.sha1);
@@ -68,8 +66,15 @@ static void add_entry(struct commit *commit, const char *host, int enable_atom_d
 			delim = '?';
 		htmlf("%cid=%s", delim, hex);
 		html("'/>\n");
+
+		html("<id>");
+		html(cgit_httpscheme());
+		html_attr(host);
+		html_attr(cgit_repourl(ctx.repo->url));
+		htmlf("/commit/?id=%s</id>\n", hex);
+	} else {
+		htmlf("<id>urn:tag:%s</id>\n", hex);
 	}
-	htmlf("<id>%s</id>\n", hex);
 	html("<content type='text'>\n");
 	html_txt(info->msg);
 	html("</content>\n");
@@ -90,7 +95,6 @@ static void add_entry(struct commit *commit, const char *host, int enable_atom_d
 	html("</div>\n");
 	html("</content>\n");
 	html("</entry>\n");
-	cgit_free_commitinfo(info);
 }
 
 
@@ -101,6 +105,7 @@ void cgit_print_atom(char *tip, char *path, int max_count, int enable_atom_diff)
 	struct commit *commit;
 	struct rev_info rev;
 	int argc = 2;
+	int had_global_updated = 0;
 
 	if (ctx.qry.show_all)
 		argv[1] = "--all";
@@ -147,9 +152,25 @@ void cgit_print_atom(char *tip, char *path, int max_count, int enable_atom_diff)
 		html_attr(host);
 		html_attr(cgit_repourl(ctx.repo->url));
 		html("'/>\n");
+
+		html("<id>");
+		html(cgit_httpscheme());
+		html_txt(host);
+		html_txt(cgit_repourl(ctx.repo->url));
+		html("</id>\n");
 	}
+
 	while ((commit = get_revision(&rev)) != NULL) {
-		add_entry(commit, host, enable_atom_diff);
+		struct commitinfo *info = cgit_parse_commit(commit);
+		if (!had_global_updated) {
+			html("<updated>");
+			cgit_print_date(info->committer_date, FMT_ATOMDATE, 0);
+			html("</updated>\n");
+			had_global_updated = 1;
+		}
+		add_entry(commit, info, host, enable_atom_diff);
+
+		cgit_free_commitinfo(info);
 		free(commit->buffer);
 		commit->buffer = NULL;
 		free_commit_list(commit->parents);
