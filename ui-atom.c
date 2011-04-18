@@ -75,9 +75,6 @@ static void add_entry(struct commit *commit, struct commitinfo *info, char *host
 	} else {
 		htmlf("<id>urn:tag:%s</id>\n", hex);
 	}
-	html("<content type='text'>\n");
-	html_txt(info->msg);
-	html("</content>\n");
 	html("<content type='xhtml'>\n");
 	html("<div xmlns='http://www.w3.org/1999/xhtml'>\n");
 	html("<pre>\n");
