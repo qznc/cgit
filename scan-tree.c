@@ -155,6 +155,8 @@ static void add_repo(const char *base, const char *path, repo_config_fn fn)
 		config_fn = fn;
 		parse_configfile(xstrdup(p), &repo_config);
 	}
+
+	free(rel);
 }
 
 static void scan_path(const char *base, const char *path, repo_config_fn fn)
@@ -219,6 +221,7 @@ void scan_projects(const char *path, const char *projectsfile, repo_config_fn fn
 	if (!projects) {
 		fprintf(stderr, "Error opening projectsfile %s: %s (%d)\n",
 			projectsfile, strerror(errno), errno);
+		return;
 	}
 	while (fgets(line, sizeof(line), projects) != NULL) {
 		for (z = &lastc(line);

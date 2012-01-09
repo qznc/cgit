@@ -15,15 +15,16 @@
 # run_test 'repo index' 'cgit_url "/" | tidy -e'
 # run_test 'repo summary' 'cgit_url "/foo" | tidy -e'
 
+unset CDPATH
 
 mkrepo() {
 	name=$1
 	count=$2
 	dir=$PWD
-	test -d $name && return
+	test -d "$name" && return
 	printf "Creating testrepo %s\n" $name
-	mkdir -p $name
-	cd $name
+	mkdir -p "$name"
+	cd "$name"
 	git init
 	n=1
 	while test $n -le $count
@@ -50,6 +51,7 @@ setup_repos()
 	mkrepo trash/repos/foo 5 >/dev/null
 	mkrepo trash/repos/bar 50 >/dev/null
 	mkrepo trash/repos/foo+bar 10 testplus >/dev/null
+	mkrepo "trash/repos/with space" 2 >/dev/null
 	cat >trash/cgitrc <<EOF
 virtual-root=/
 cache-root=$PWD/trash/cache
@@ -75,6 +77,10 @@ repo.desc=the bar repo
 repo.url=foo+bar
 repo.path=$PWD/trash/repos/foo+bar/.git
 repo.desc=the foo+bar repo
+
+repo.url=with space
+repo.path=$PWD/trash/repos/with space/.git
+repo.desc=spaced repo
 EOF
 }
 
@@ -101,6 +107,12 @@ tests_done()
 
 run_test()
 {
+	bug=0
+	if test "$1" = "BUG"
+	then
+		bug=1
+		shift
+	fi
 	desc=$1
 	script=$2
 	test_count=$(expr $test_count + 1)
@@ -109,9 +121,15 @@ run_test()
 	eval "$2" >>test-output.log 2>>test-output.log
 	res=$?
 	printf "test %d: exitcode=%d\n" $test_count $res >>test-output.log
-	if test $res = 0
+	if test $res = 0 -a $bug = 0
 	then
 		printf " %2d) %-60s [ok]\n" $test_count "$desc"
+	elif test $res = 0 -a $bug = 1
+	then
+		printf " %2d) %-60s [BUG FIXED]\n" $test_count "$desc"
+	elif test $bug = 1
+	then
+		printf " %2d) %-60s [KNOWN BUG]\n" $test_count "$desc"
 	else
 		test_failed=$(expr $test_failed + 1)
 		printf " %2d) %-60s [failed]\n" $test_count "$desc"

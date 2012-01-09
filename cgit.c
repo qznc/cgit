@@ -29,15 +29,17 @@ void add_mimetype(const char *name, const char *value)
 struct cgit_filter *new_filter(const char *cmd, int extra_args)
 {
 	struct cgit_filter *f;
+	int args_size = 0;
 
 	if (!cmd || !cmd[0])
 		return NULL;
 
 	f = xmalloc(sizeof(struct cgit_filter));
 	f->cmd = xstrdup(cmd);
-	f->argv = xmalloc((2 + extra_args) * sizeof(char *));
+	args_size = (2 + extra_args) * sizeof(char *);
+	f->argv = xmalloc(args_size);
+	memset(f->argv, 0, args_size);
 	f->argv[0] = f->cmd;
-	f->argv[1] = NULL;
 	return f;
 }
 
@@ -401,13 +403,17 @@ static int prepare_repo_cmd(struct cgit_context *ctx)
 	char *tmp;
 	unsigned char sha1[20];
 	int nongit = 0;
+	int rc;
 
 	setenv("GIT_DIR", ctx->repo->path, 1);
 	setup_git_directory_gently(&nongit);
 	if (nongit) {
+		rc = errno;
 		ctx->page.title = fmt("%s - %s", ctx->cfg.root_title,
 				      "config error");
-		tmp = fmt("Not a git repository: '%s'", ctx->repo->path);
+		tmp = fmt("Failed to open %s: %s",
+			  ctx->repo->name,
+			  rc ? strerror(rc) : "Not a valid git repository");
 		ctx->repo = NULL;
 		cgit_print_http_headers(ctx);
 		cgit_print_docstart(ctx);
@@ -755,8 +761,11 @@ int main(int argc, const char **argv)
 	 * that virtual-root equals SCRIPT_NAME, minus any possibly
 	 * trailing slashes.
 	 */
-	if (!ctx.cfg.virtual_root)
+	if (!ctx.cfg.virtual_root && ctx.cfg.script_name) {
 		ctx.cfg.virtual_root = trim_end(ctx.cfg.script_name, '/');
+		if (!ctx.cfg.virtual_root)
+			ctx.cfg.virtual_root = "";
+        }
 
 	/* If no url parameter is specified on the querystring, lets
 	 * use PATH_INFO as url. This allows cgit to work with virtual
