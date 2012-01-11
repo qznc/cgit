@@ -129,7 +129,8 @@ void html_txt(const char *txt)
 	const char *t = txt;
 	while (t && *t) {
 		int c = *t;
-		if (c == '<' || c == '>' || c == '&') {
+		if ((c < 0x20 && c != '\t' && c != '\n' && c != '\r')
+				|| (c == '<' || c == '>' || c == '&')) {
 			html_raw(txt, t - txt);
 			if (c == '>')
 				html("&gt;");
@@ -150,7 +151,8 @@ void html_ntxt(int len, const char *txt)
 	const char *t = txt;
 	while (t && *t && len--) {
 		int c = *t;
-		if (c == '<' || c == '>' || c == '&') {
+		if ((c < 0x20 && c != '\t' && c != '\n' && c != '\r')
+				|| (c == '<' || c == '>' || c == '&')) {
 			html_raw(txt, t - txt);
 			if (c == '>')
 				html("&gt;");
@@ -186,7 +188,8 @@ void html_attr(const char *txt)
 	const char *t = txt;
 	while (t && *t) {
 		int c = *t;
-		if (c == '<' || c == '>' || c == '\'' || c == '\"' || c == '&') {
+		if (c == '<' || c == '>' || c == '\'' || c == '\"' || c == '&'
+				|| (c < 0x20 && c != '\t' && c != '\n' && c != '\r')) {
 			html_raw(txt, t - txt);
 			if (c == '>')
 				html("&gt;");
