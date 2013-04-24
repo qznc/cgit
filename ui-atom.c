@@ -150,6 +150,17 @@ void cgit_print_atom(char *tip, char *path, int max_count, int enable_atom_diff)
 		html_attr(cgit_repourl(ctx.repo->url));
 		html("'/>\n");
 
+		html("<link rel='self' type='application/atom+xml' href='");
+		html(cgit_httpscheme());
+		html_attr(host);
+		html_attr(cgit_repourl(ctx.repo->url));
+		html("atom");
+		if (tip) {
+			html("/?h=");
+			html_txt(tip);
+		}
+		html("'/>\n");
+
 		html("<id>");
 		html(cgit_httpscheme());
 		html_txt(host);
