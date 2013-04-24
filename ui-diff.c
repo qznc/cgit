@@ -108,6 +108,7 @@ static void print_fileinfo(struct fileinfo *info)
 	if (info->binary) {
 		htmlf("bin</td><td class='graph'>%ld -> %ld bytes",
 		      info->old_size, info->new_size);
+		html("</td></tr>\n");
 		return;
 	}
 	htmlf("%d", info->added + info->removed);
