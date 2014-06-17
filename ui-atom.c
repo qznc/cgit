@@ -11,7 +11,7 @@
 #include "ui-shared.h"
 #include "ui-diff.h"
 
-void add_entry(struct commit *commit, char *host)
+void add_entry(struct commit *commit, char *host, int enable_atom_diff)
 {
 	char delim = '&';
 	char *hex;
@@ -77,9 +77,11 @@ void add_entry(struct commit *commit, char *host)
 	html("<pre>\n");
 	html_txt(info->msg);
 	html("</pre>\n");
-	html("<div class='diff'>\n");
-	cgit_print_diff(hex, hex_parent, NULL);
-	html("</div>");
+	if (enable_atom_diff) {
+		html("<div class='diff'>\n");
+		cgit_print_diff(hex, hex_parent, NULL);
+		html("</div>");
+	}
 	html("</div>\n");
 	html("</content>\n");
 	html("</entry>\n");
@@ -87,7 +89,7 @@ void add_entry(struct commit *commit, char *host)
 }
 
 
-void cgit_print_atom(char *tip, char *path, int max_count)
+void cgit_print_atom(char *tip, char *path, int max_count, int enable_atom_diff)
 {
 	char *host;
 	const char *argv[] = {NULL, tip, NULL, NULL, NULL};
@@ -141,7 +143,7 @@ void cgit_print_atom(char *tip, char *path, int max_count)
 		html("'/>\n");
 	}
 	while ((commit = get_revision(&rev)) != NULL) {
-		add_entry(commit, host);
+		add_entry(commit, host, enable_atom_diff);
 		free(commit->buffer);
 		commit->buffer = NULL;
 		free_commit_list(commit->parents);
