@@ -33,7 +33,7 @@ static void HEAD_fn(struct cgit_context *ctx)
 
 static void atom_fn(struct cgit_context *ctx)
 {
-	cgit_print_atom(ctx->qry.head, ctx->qry.path, ctx->cfg.max_atom_items);
+	cgit_print_atom(ctx->qry.head, ctx->qry.path, ctx->cfg.max_atom_items, ctx->repo->enable_atom_diff);
 }
 
 static void about_fn(struct cgit_context *ctx)

@@ -59,6 +59,8 @@ void repo_config(struct cgit_repo *repo, const char *name, const char *value)
 		repo->defbranch = xstrdup(value);
 	else if (!strcmp(name, "snapshots"))
 		repo->snapshots = ctx.cfg.snapshots & cgit_parse_snapshots_mask(value);
+	else if (!strcmp(name, "enable-atom-diff"))
+		repo->enable_atom_diff = ctx.cfg.enable_atom_diff * atoi(value);
 	else if (!strcmp(name, "enable-commit-graph"))
 		repo->enable_commit_graph = ctx.cfg.enable_commit_graph * atoi(value);
 	else if (!strcmp(name, "enable-log-filecount"))
@@ -143,6 +145,8 @@ void config_cb(const char *name, const char *value)
 		ctx.cfg.noheader = atoi(value);
 	else if (!strcmp(name, "snapshots"))
 		ctx.cfg.snapshots = cgit_parse_snapshots_mask(value);
+	else if (!strcmp(name, "enable-atom-diff"))
+		ctx.cfg.enable_atom_diff = atoi(value);
 	else if (!strcmp(name, "enable-filter-overrides"))
 		ctx.cfg.enable_filter_overrides = atoi(value);
 	else if (!strcmp(name, "enable-gitweb-owner"))
@@ -311,6 +315,7 @@ static void prepare_context(struct cgit_context *ctx)
 	ctx->cfg.css = "/cgit.css";
 	ctx->cfg.logo = "/cgit.png";
 	ctx->cfg.local_time = 0;
+	ctx->cfg.enable_atom_diff = 1;
 	ctx->cfg.enable_gitweb_owner = 1;
 	ctx->cfg.enable_tree_linenumbers = 1;
 	ctx->cfg.max_repo_count = 50;
@@ -557,6 +562,8 @@ void print_repo(FILE *f, struct cgit_repo *repo)
 		fprintf(f, "repo.section=%s\n", repo->section);
 	if (repo->clone_url)
 		fprintf(f, "repo.clone-url=%s\n", repo->clone_url);
+	fprintf(f, "repo.enable-atom-diff=%d\n",
+		repo->enable_atom_diff);
 	fprintf(f, "repo.enable-commit-graph=%d\n",
 	        repo->enable_commit_graph);
 	fprintf(f, "repo.enable-log-filecount=%d\n",
