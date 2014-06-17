@@ -77,9 +77,9 @@ void add_entry(struct commit *commit, char *host)
 	html("<pre>\n");
 	html_txt(info->msg);
 	html("</pre>\n");
-	html("<div class='diff'>\n");
+	html("<pre class='diff'>\n");
 	cgit_print_diff(hex, hex_parent, NULL);
-	html("</div>");
+	html("</pre>");
 	html("</div>\n");
 	html("</content>\n");
 	html("</entry>\n");
