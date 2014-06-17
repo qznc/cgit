@@ -78,6 +78,10 @@ void add_entry(struct commit *commit, char *host)
 	html_txt(info->msg);
 	html("</pre>\n");
 	html("<pre class='diff'>\n");
+	html("<style scoped>\n"); /* HTML5 with graceful degradation */
+	html("table.diff .add, span.add { background-color: #afa; }");
+	html("table.diff .del, span.remove { background-color: #faa; }");
+	html("</style>\n");
 	cgit_print_diff(hex, hex_parent, NULL);
 	html("</pre>");
 	html("</div>\n");
