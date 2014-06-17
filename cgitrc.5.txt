@@ -141,6 +141,10 @@ embedded::
 	suitable for embedding in other html pages. Default value: none. See
 	also: "noheader".
 
+enable-atom-diff::
+	Flag which, when set to "1", will make cgit include a html-escaped diff
+	within the atom feed commit entries. Default value: "0".
+
 enable-commit-graph::
 	Flag which, when set to "1", will make cgit print an ASCII-art commit
 	history graph to the left of the commit messages in the repository

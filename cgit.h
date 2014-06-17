@@ -87,6 +87,7 @@ struct cgit_repo {
 	char *logo;
 	char *logo_link;
 	int snapshots;
+	int enable_atom_diff;
 	int enable_commit_graph;
 	int enable_log_filecount;
 	int enable_log_linecount;
@@ -213,6 +214,7 @@ struct cgit_config {
 	int cache_snapshot_ttl;
 	int case_sensitive_sort;
 	int embedded;
+	int enable_atom_diff;
 	int enable_filter_overrides;
 	int enable_http_clone;
 	int enable_index_links;
