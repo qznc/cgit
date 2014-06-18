@@ -81,7 +81,7 @@ void add_entry(struct commit *commit, struct commitinfo *info, char *host, int e
 	html("</pre>\n");
 	if (enable_atom_diff) {
 		html("<pre class='diff'>\n");
-		html("<style scoped>\n"); /* HTML5 with graceful degradation */
+		html("<style scoped=\"scoped\">\n"); /* HTML5 with graceful degradation */
 		html("table.diff .add, span.add { background-color: #afa; }");
 		html("table.diff .del, span.remove { background-color: #faa; }");
 		html("</style>\n");
